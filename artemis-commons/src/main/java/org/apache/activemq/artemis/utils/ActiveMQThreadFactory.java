@@ -128,13 +128,8 @@ public final class ActiveMQThreadFactory implements ThreadFactory {
    }
 
    public static ActiveMQThreadFactory defaultThreadFactory() {
-      final String callerClassName = Thread.currentThread().getStackTrace()[2].getClassName();
-      return AccessController.doPrivileged(new PrivilegedAction<ActiveMQThreadFactory>() {
-         @Override
-         public ActiveMQThreadFactory run() {
-            return new ActiveMQThreadFactory(callerClassName, false, null);
-         }
-      });
+      String callerClassName = Thread.currentThread().getStackTrace()[2].getClassName();
+      return new ActiveMQThreadFactory(callerClassName, false, null);
    }
 
 }

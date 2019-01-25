@@ -157,12 +157,7 @@ public class NetworkHealthCheck extends ActiveMQScheduledComponent {
 
    @Override
    protected ActiveMQThreadFactory getThreadFactory() {
-      return AccessController.doPrivileged(new PrivilegedAction<ActiveMQThreadFactory>() {
-         @Override
-         public ActiveMQThreadFactory run() {
-            return new ActiveMQThreadFactory("NetworkChecker", "Network-Checker-", false, getThisClassLoader());
-         }
-      });
+      return new ActiveMQThreadFactory("NetworkChecker", "Network-Checker-", false, getThisClassLoader());
    }
 
 

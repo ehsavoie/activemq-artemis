@@ -25,8 +25,6 @@ import javax.security.auth.Subject;
 import javax.security.auth.login.LoginContext;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.security.PrivilegedExceptionAction;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -347,34 +345,19 @@ public class NettyAcceptor extends AbstractAcceptor {
 
          if (useEpoll && Epoll.isAvailable()) {
             channelClazz = EpollServerSocketChannel.class;
-            eventLoopGroup = new EpollEventLoopGroup(remotingThreads, AccessController.doPrivileged(new PrivilegedAction<ActiveMQThreadFactory>() {
-               @Override
-               public ActiveMQThreadFactory run() {
-                  return new ActiveMQThreadFactory("activemq-netty-threads", true, ClientSessionFactoryImpl.class.getClassLoader());
-               }
-            }));
+            eventLoopGroup = new EpollEventLoopGroup(remotingThreads, new ActiveMQThreadFactory("activemq-netty-threads", true, ClientSessionFactoryImpl.class.getClassLoader()));
             acceptorType = EPOLL_ACCEPTOR_TYPE;
 
             logger.debug("Acceptor using native epoll");
          } else if (useKQueue && KQueue.isAvailable()) {
             channelClazz = KQueueServerSocketChannel.class;
-            eventLoopGroup = new KQueueEventLoopGroup(remotingThreads, AccessController.doPrivileged(new PrivilegedAction<ActiveMQThreadFactory>() {
-               @Override
-               public ActiveMQThreadFactory run() {
-                  return new ActiveMQThreadFactory("activemq-netty-threads", true, ClientSessionFactoryImpl.class.getClassLoader());
-               }
-            }));
+            eventLoopGroup = new KQueueEventLoopGroup(remotingThreads, new ActiveMQThreadFactory("activemq-netty-threads", true, ClientSessionFactoryImpl.class.getClassLoader()));
             acceptorType = KQUEUE_ACCEPTOR_TYPE;
 
             logger.debug("Acceptor using native kqueue");
          } else {
             channelClazz = NioServerSocketChannel.class;
-            eventLoopGroup = new NioEventLoopGroup(remotingThreads, AccessController.doPrivileged(new PrivilegedAction<ActiveMQThreadFactory>() {
-               @Override
-               public ActiveMQThreadFactory run() {
-                  return new ActiveMQThreadFactory("activemq-netty-threads", true, ClientSessionFactoryImpl.class.getClassLoader());
-               }
-            }));
+            eventLoopGroup = new NioEventLoopGroup(remotingThreads, new ActiveMQThreadFactory("activemq-netty-threads", true, ClientSessionFactoryImpl.class.getClassLoader()));
             acceptorType = NIO_ACCEPTOR_TYPE;
             logger.debug("Acceptor using nio");
          }

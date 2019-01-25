@@ -16,8 +16,6 @@
  */
 package org.apache.activemq.artemis.core.remoting.server.impl;
 
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -197,14 +195,9 @@ public class RemotingServiceImpl implements RemotingService, ServerConnectionLif
       // This needs to be a different thread pool to the main thread pool especially for OIO where we may need
       // to support many hundreds of connections, but the main thread pool must be kept small for better performance
 
-      ThreadFactory tFactory = AccessController.doPrivileged(new PrivilegedAction<ThreadFactory>() {
-         @Override
-         public ThreadFactory run() {
-            return new ActiveMQThreadFactory("ActiveMQ-remoting-threads-" + server.toString() +
+      ThreadFactory tFactory = new ActiveMQThreadFactory("ActiveMQ-remoting-threads-" + server.toString() +
                                                 "-" +
                                                 System.identityHashCode(this), false, Thread.currentThread().getContextClassLoader());
-         }
-      });
 
       threadPool = Executors.newCachedThreadPool(tFactory);
 

@@ -25,8 +25,6 @@ import java.io.StringWriter;
 import java.lang.management.ManagementFactory;
 import java.net.URI;
 import java.net.URL;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -2453,12 +2451,7 @@ public class ActiveMQServerImpl implements ActiveMQServer {
        * Executor based on the provided Thread pool.  Otherwise we create a new ThreadPool.
        */
       if (serviceRegistry.getExecutorService() == null) {
-         ThreadFactory tFactory = AccessController.doPrivileged(new PrivilegedAction<ThreadFactory>() {
-            @Override
-            public ThreadFactory run() {
-               return new ActiveMQThreadFactory("ActiveMQ-server-" + this.toString(), false, ClientSessionFactoryImpl.class.getClassLoader());
-            }
-         });
+         ThreadFactory tFactory = new ActiveMQThreadFactory("ActiveMQ-server-" + this.toString(), false, ClientSessionFactoryImpl.class.getClassLoader());
 
          if (configuration.getThreadPoolMaxSize() == -1) {
             threadPool = new ThreadPoolExecutor(0, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS, new SynchronousQueue<Runnable>(), tFactory);
@@ -2474,12 +2467,7 @@ public class ActiveMQServerImpl implements ActiveMQServer {
       if (serviceRegistry.getIOExecutorService() != null) {
          this.ioExecutorFactory = new OrderedExecutorFactory(serviceRegistry.getIOExecutorService());
       } else {
-         ThreadFactory tFactory = AccessController.doPrivileged(new PrivilegedAction<ThreadFactory>() {
-            @Override
-            public ThreadFactory run() {
-               return new ActiveMQThreadFactory("ActiveMQ-IO-server-" + this.toString(), false, ClientSessionFactoryImpl.class.getClassLoader());
-            }
-         });
+         ThreadFactory tFactory = new ActiveMQThreadFactory("ActiveMQ-IO-server-" + this.toString(), false, ClientSessionFactoryImpl.class.getClassLoader());
 
          this.ioExecutorPool = new ThreadPoolExecutor(0, Integer.MAX_VALUE, 60L, TimeUnit.SECONDS, new SynchronousQueue<Runnable>(), tFactory);
          this.ioExecutorFactory = new OrderedExecutorFactory(ioExecutorPool);
@@ -2489,12 +2477,7 @@ public class ActiveMQServerImpl implements ActiveMQServer {
        * Scheduled ExecutorService otherwise we create a new one.
        */
       if (serviceRegistry.getScheduledExecutorService() == null) {
-         ThreadFactory tFactory = AccessController.doPrivileged(new PrivilegedAction<ThreadFactory>() {
-            @Override
-            public ThreadFactory run() {
-               return new ActiveMQThreadFactory("ActiveMQ-scheduled-threads", false, ClientSessionFactoryImpl.class.getClassLoader());
-            }
-         });
+         ThreadFactory tFactory = new ActiveMQThreadFactory("ActiveMQ-scheduled-threads", false, ClientSessionFactoryImpl.class.getClassLoader());
          scheduledPool = new ScheduledThreadPoolExecutor(configuration.getScheduledThreadPoolMaxSize(), tFactory);
       } else {
          this.scheduledPoolSupplied = true;
