@@ -31,9 +31,7 @@ import org.apache.activemq.artemis.api.core.ActiveMQException;
 import org.apache.activemq.artemis.api.core.client.ActiveMQClient;
 import org.apache.activemq.artemis.core.client.ActiveMQClientLogger;
 import org.apache.activemq.artemis.core.server.ActiveMQComponent;
-import org.apache.activemq.artemis.core.server.ActiveMQMessageBundle;
 import org.apache.activemq.artemis.spi.core.remoting.AbstractConnector;
-import org.apache.activemq.artemis.spi.core.remoting.Acceptor;
 import org.apache.activemq.artemis.spi.core.remoting.BaseConnectionLifeCycleListener;
 import org.apache.activemq.artemis.spi.core.remoting.BufferHandler;
 import org.apache.activemq.artemis.spi.core.remoting.ClientConnectionLifeCycleListener;
@@ -45,6 +43,7 @@ import org.apache.activemq.artemis.utils.ActiveMQThreadPoolExecutor;
 import org.apache.activemq.artemis.utils.ConfigurationHelper;
 import org.apache.activemq.artemis.utils.actors.OrderedExecutorFactory;
 import org.jboss.logging.Logger;
+import org.apache.activemq.artemis.core.server.ActiveMQInVMMessageBundle;
 
 public class InVMConnector extends AbstractConnector {
 
@@ -88,7 +87,7 @@ public class InVMConnector extends AbstractConnector {
 
    private final BaseConnectionLifeCycleListener listener;
 
-   private final InVMAcceptor acceptor;
+   private final InVmAccept acceptor;
 
    private final ConcurrentMap<String, Connection> connections = new ConcurrentHashMap<>();
 
@@ -157,10 +156,6 @@ public class InVMConnector extends AbstractConnector {
       this.protocolManager = protocolManager;
    }
 
-   public Acceptor getAcceptor() {
-      return acceptor;
-   }
-
    @Override
    public synchronized void close() {
       if (!started) {
@@ -193,7 +188,7 @@ public class InVMConnector extends AbstractConnector {
          return null;
       }
 
-      if (acceptor.getConnectionsAllowed() == -1 || acceptor.getConnectionCount() < acceptor.getConnectionsAllowed()) {
+      if (acceptor.canConnect()) {
          Connection conn = internalCreateConnection(acceptor.getHandler(), new Listener(), acceptor.getExecutorFactory().getExecutor());
 
          acceptor.connect((String) conn.getID(), handler, this, executorFactory.getExecutor());
@@ -253,7 +248,7 @@ public class InVMConnector extends AbstractConnector {
                                     final Connection connection,
                                     final ClientProtocolManager protocol) {
          if (connections.putIfAbsent((String) connection.getID(), connection) != null) {
-            throw ActiveMQMessageBundle.BUNDLE.connectionExists(connection.getID());
+            throw ActiveMQInVMMessageBundle.BUNDLE.connectionExists(connection.getID());
          }
 
          //noinspection deprecation

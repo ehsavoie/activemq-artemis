@@ -43,7 +43,7 @@ import org.apache.activemq.artemis.utils.actors.OrderedExecutorFactory;
 import org.apache.activemq.artemis.utils.collections.TypedProperties;
 import org.jboss.logging.Logger;
 
-public final class InVMAcceptor extends AbstractAcceptor {
+public final class InVMAcceptor extends AbstractAcceptor implements InVmAccept {
 
    private final int id;
 
@@ -122,10 +122,12 @@ public final class InVMAcceptor extends AbstractAcceptor {
       return clusterConnection;
    }
 
+   @Override
    public long getConnectionsAllowed() {
       return connectionsAllowed;
    }
 
+   @Override
    public int getConnectionCount() {
       return connections.size();
    }
@@ -208,6 +210,7 @@ public final class InVMAcceptor extends AbstractAcceptor {
       this.notificationService = notificationService;
    }
 
+   @Override
    public BufferHandler getHandler() {
       if (!started) {
          throw new IllegalStateException("Acceptor is not started");
@@ -216,10 +219,12 @@ public final class InVMAcceptor extends AbstractAcceptor {
       return handler;
    }
 
+   @Override
    public ExecutorFactory getExecutorFactory() {
       return executorFactory;
    }
 
+   @Override
    public void connect(final String connectionID,
                        final BufferHandler remoteHandler,
                        final InVMConnector connector,
@@ -237,6 +242,7 @@ public final class InVMAcceptor extends AbstractAcceptor {
       connectionListener.connectionCreated(this, inVMConnection, protocolMap.get(ActiveMQClient.DEFAULT_CORE_PROTOCOL));
    }
 
+   @Override
    public void disconnect(final String connectionID) {
       if (!started) {
          return;

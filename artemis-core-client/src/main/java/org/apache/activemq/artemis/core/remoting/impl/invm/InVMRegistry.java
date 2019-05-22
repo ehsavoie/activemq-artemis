@@ -19,27 +19,27 @@ package org.apache.activemq.artemis.core.remoting.impl.invm;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import org.apache.activemq.artemis.core.server.ActiveMQMessageBundle;
+import org.apache.activemq.artemis.core.server.ActiveMQInVMMessageBundle;
 
 public final class InVMRegistry {
 
    public static final InVMRegistry instance = new InVMRegistry();
 
-   private final ConcurrentMap<Integer, InVMAcceptor> acceptors = new ConcurrentHashMap<>();
+   private final ConcurrentMap<Integer, InVmAccept> acceptors = new ConcurrentHashMap<>();
 
-   public void registerAcceptor(final int id, final InVMAcceptor acceptor) {
+   public void registerAcceptor(final int id, final InVmAccept acceptor) {
       if (acceptors.putIfAbsent(id, acceptor) != null) {
-         throw ActiveMQMessageBundle.BUNDLE.acceptorExists(id);
+         throw ActiveMQInVMMessageBundle.BUNDLE.acceptorExists(id);
       }
    }
 
    public void unregisterAcceptor(final int id) {
       if (acceptors.remove(id) == null) {
-         throw ActiveMQMessageBundle.BUNDLE.acceptorNotExists(id);
+         throw ActiveMQInVMMessageBundle.BUNDLE.acceptorNotExists(id);
       }
    }
 
-   public InVMAcceptor getAcceptor(final int id) {
+   public InVmAccept getAcceptor(final int id) {
       return acceptors.get(id);
    }
 

@@ -29,7 +29,7 @@ import org.apache.activemq.artemis.api.core.ActiveMQBuffers;
 import org.apache.activemq.artemis.api.core.ActiveMQInterruptedException;
 import org.apache.activemq.artemis.api.core.TransportConfiguration;
 import org.apache.activemq.artemis.core.security.ActiveMQPrincipal;
-import org.apache.activemq.artemis.core.server.ActiveMQServerLogger;
+import org.apache.activemq.artemis.core.server.ActiveMQInVmLogger;
 import org.apache.activemq.artemis.spi.core.protocol.RemotingConnection;
 import org.apache.activemq.artemis.spi.core.remoting.BaseConnectionLifeCycleListener;
 import org.apache.activemq.artemis.spi.core.remoting.BufferHandler;
@@ -208,7 +208,7 @@ public class InVMConnection implements Connection {
                   }
                } catch (Exception e) {
                   final String msg = "Failed to write to handler on connector " + this;
-                  ActiveMQServerLogger.LOGGER.errorWritingToInvmConnector(e, this);
+                  ActiveMQInVmLogger.LOGGER.errorWritingToInvmConnector(e, this);
                   throw new IllegalStateException(msg, e);
                } finally {
                   buffer.release();
@@ -230,7 +230,7 @@ public class InVMConnection implements Connection {
 
             try {
                if (!latch.await(10, TimeUnit.SECONDS)) {
-                  ActiveMQServerLogger.LOGGER.timedOutFlushingInvmChannel();
+                  ActiveMQInVmLogger.LOGGER.timedOutFlushingInvmChannel();
                }
             } catch (InterruptedException e) {
                throw new ActiveMQInterruptedException(e);
