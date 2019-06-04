@@ -20,6 +20,7 @@ import javax.json.JsonObject;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+import javax.net.ssl.SSLContext;
 
 import org.apache.activemq.artemis.core.client.ActiveMQClientMessageBundle;
 import org.apache.activemq.artemis.core.remoting.impl.TransportConfigurationUtil;
@@ -53,6 +54,8 @@ public class TransportConfiguration implements Serializable {
    private Map<String, Object> params;
 
    private Map<String, Object> extraProps;
+
+   private transient SSLContext sslContext;
 
    private static final byte TYPE_BOOLEAN = 0;
 
@@ -129,7 +132,7 @@ public class TransportConfiguration implements Serializable {
    }
 
    public TransportConfiguration newTransportConfig(String newName) {
-      return new TransportConfiguration(factoryClassName, params, newName);
+      return new TransportConfiguration(factoryClassName, params, newName).setSslContext(sslContext);
    }
 
    /**
@@ -150,6 +153,15 @@ public class TransportConfiguration implements Serializable {
     */
    public TransportConfiguration(final String className) {
       this(className, new HashMap<String, Object>(), UUIDGenerator.getInstance().generateStringUUID());
+   }
+
+   public TransportConfiguration setSslContext(SSLContext sslContext) {
+      this.sslContext = sslContext;
+      return this;
+   }
+
+   public SSLContext getSslContext() {
+      return this.sslContext;
    }
 
    /**

@@ -19,6 +19,7 @@ package org.apache.activemq.artemis.core.remoting.impl.netty;
 import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ScheduledExecutorService;
+import javax.net.ssl.SSLContext;
 
 import org.apache.activemq.artemis.spi.core.remoting.BufferHandler;
 import org.apache.activemq.artemis.spi.core.remoting.ClientConnectionLifeCycleListener;
@@ -35,8 +36,9 @@ public class NettyConnectorFactory implements ConnectorFactory {
                                     final Executor closeExecutor,
                                     final Executor threadPool,
                                     final ScheduledExecutorService scheduledThreadPool,
-                                    final ClientProtocolManager protocolManager) {
-      return new NettyConnector(configuration, handler, listener, closeExecutor, threadPool, scheduledThreadPool);
+                                    final ClientProtocolManager protocolManager,
+                                    final SSLContext ssLContext) {
+      return new NettyConnector(configuration, handler, listener, closeExecutor, threadPool, scheduledThreadPool, ssLContext);
    }
 
    @Override

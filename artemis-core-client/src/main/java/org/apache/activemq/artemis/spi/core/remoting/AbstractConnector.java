@@ -17,6 +17,7 @@
 package org.apache.activemq.artemis.spi.core.remoting;
 
 import java.util.Map;
+import javax.net.ssl.SSLContext;
 
 /**
  * Abstract connector
@@ -24,8 +25,20 @@ import java.util.Map;
 public abstract class AbstractConnector implements Connector {
 
    protected final Map<String, Object> configuration;
+   private SSLContext sslContext;
 
    protected AbstractConnector(Map<String, Object> configuration) {
       this.configuration = configuration;
    }
+
+   @Override
+   public SSLContext getSslContext() {
+      return sslContext;
+   }
+
+   @Override
+   public void setSslContext(SSLContext sslContext) {
+      this.sslContext = sslContext;
+   }
+
 }

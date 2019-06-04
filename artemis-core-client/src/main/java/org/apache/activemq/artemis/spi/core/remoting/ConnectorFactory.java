@@ -19,6 +19,7 @@ package org.apache.activemq.artemis.spi.core.remoting;
 import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ScheduledExecutorService;
+import javax.net.ssl.SSLContext;
 
 import org.apache.activemq.artemis.api.core.TransportConfigurationHelper;
 
@@ -46,7 +47,8 @@ public interface ConnectorFactory extends TransportConfigurationHelper {
                              Executor closeExecutor,
                              Executor threadPool,
                              ScheduledExecutorService scheduledThreadPool,
-                             ClientProtocolManager protocolManager);
+                             ClientProtocolManager protocolManager,
+                             SSLContext sslContext);
 
    /**
     * Indicates if connectors from this factory are reliable or not. If a connector is reliable then connection

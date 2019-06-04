@@ -263,7 +263,7 @@ public class ClientSessionFactoryImpl implements ClientSessionFactoryInternal, C
       // to create a connector just to validate if the parameters are ok.
       // so this will create the instance to be used on the isEquivalent check
       if (localConnector == null) {
-         localConnector = connectorFactory.createConnector(currentConnectorConfig.getParams(), new DelegatingBufferHandler(), this, closeExecutor, threadPool, scheduledThreadPool, clientProtocolManager);
+         localConnector = connectorFactory.createConnector(currentConnectorConfig.getParams(), new DelegatingBufferHandler(), this, closeExecutor, threadPool, scheduledThreadPool, clientProtocolManager, currentConnectorConfig.getSslContext());
       }
 
       if (localConnector.isEquivalent(live.getParams()) && backUp != null && !localConnector.isEquivalent(backUp.getParams())) {
@@ -1072,7 +1072,7 @@ public class ClientSessionFactoryImpl implements ClientSessionFactoryInternal, C
    }
 
    protected Connector createConnector(ConnectorFactory connectorFactory, TransportConfiguration configuration) {
-      Connector connector = connectorFactory.createConnector(configuration.getParams(), new DelegatingBufferHandler(), this, closeExecutor, threadPool, scheduledThreadPool, clientProtocolManager);
+      Connector connector = connectorFactory.createConnector(configuration.getParams(), new DelegatingBufferHandler(), this, closeExecutor, threadPool, scheduledThreadPool, clientProtocolManager, configuration.getSslContext());
       if (connector instanceof NettyConnector) {
          NettyConnector nettyConnector = (NettyConnector) connector;
          if (nettyConnector.getConnectTimeoutMillis() < 0) {

@@ -59,6 +59,7 @@ import org.apache.activemq.artemis.core.cluster.DiscoveryGroup;
 import org.apache.activemq.artemis.core.cluster.DiscoveryListener;
 import org.apache.activemq.artemis.core.protocol.core.impl.ActiveMQClientProtocolManagerFactory;
 import org.apache.activemq.artemis.core.remoting.FailureListener;
+import org.apache.activemq.artemis.core.remoting.impl.netty.TransportConstants;
 import org.apache.activemq.artemis.spi.core.remoting.ClientProtocolManager;
 import org.apache.activemq.artemis.spi.core.remoting.ClientProtocolManagerFactory;
 import org.apache.activemq.artemis.spi.core.remoting.Connector;
@@ -549,7 +550,14 @@ public final class ServerLocatorImpl implements ServerLocatorInternal, Discovery
             }
             int pos = loadBalancingPolicy.select(usedTopology.length);
             Pair<TransportConfiguration, TransportConfiguration> pair = usedTopology[pos];
-
+            if (pair.getA().getParams().containsKey(TransportConstants.SSL_CONTEXT) && pair.getA().getSslContext() == null) {
+               for (TransportConfiguration initialConnector : initialConnectors) {
+                  if (pair.getA().getParams().get(TransportConstants.SSL_CONTEXT).equals(initialConnector.getParams().get(TransportConstants.SSL_CONTEXT))) {
+                     pair.getA().setSslContext(initialConnector.getSslContext());
+                     break;
+                  }
+               }
+            }
             return pair.getA();
          } else {
             if (logger.isTraceEnabled()) {

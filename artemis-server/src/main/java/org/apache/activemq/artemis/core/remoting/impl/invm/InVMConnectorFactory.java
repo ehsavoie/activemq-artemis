@@ -19,6 +19,7 @@ package org.apache.activemq.artemis.core.remoting.impl.invm;
 import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ScheduledExecutorService;
+import javax.net.ssl.SSLContext;
 
 import org.apache.activemq.artemis.spi.core.remoting.BufferHandler;
 import org.apache.activemq.artemis.spi.core.remoting.ClientConnectionLifeCycleListener;
@@ -35,7 +36,8 @@ public class InVMConnectorFactory implements ConnectorFactory {
                                     final Executor closeExecutor,
                                     final Executor threadPool,
                                     final ScheduledExecutorService scheduledThreadPool,
-                                    final ClientProtocolManager protocolManager) {
+                                    final ClientProtocolManager protocolManager,
+                                    final SSLContext sslContext) {
       InVMConnector connector = new InVMConnector(configuration, handler, listener, closeExecutor, threadPool, protocolManager);
 
       return connector;

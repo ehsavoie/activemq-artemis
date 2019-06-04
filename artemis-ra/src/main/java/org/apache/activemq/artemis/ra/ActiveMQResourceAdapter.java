@@ -1730,6 +1730,35 @@ public class ActiveMQResourceAdapter implements ResourceAdapter, Serializable {
       return cf;
    }
 
+   protected TransportConfiguration[] createTransportConfiguration(ConnectionFactoryProperties overrideProperties) {
+      List<String> connectorClassName = overrideProperties.getParsedConnectorClassNames() != null ? overrideProperties.getParsedConnectorClassNames() : raProperties.getParsedConnectorClassNames();
+
+      List<Map<String, Object>> connectionParams;
+      if (overrideProperties.getParsedConnectorClassNames() != null) {
+         connectionParams = overrideProperties.getParsedConnectionParameters();
+      } else {
+         connectionParams = raProperties.getParsedConnectionParameters();
+      }
+
+      return createTransportConfiguration(connectorClassName,connectionParams);
+   }
+
+   protected TransportConfiguration[] createTransportConfiguration(List<String> connectorClassName, List<Map<String, Object>> connectionParams) {
+      TransportConfiguration[] transportConfigurations = new TransportConfiguration[connectorClassName.size()];
+      for (int i = 0; i < connectorClassName.size(); i++) {
+         TransportConfiguration tc;
+         if (connectionParams == null || i >= connectionParams.size()) {
+            tc = new TransportConfiguration(connectorClassName.get(i));
+            ActiveMQRALogger.LOGGER.debug("No connector params provided using default");
+         } else {
+            tc = new TransportConfiguration(connectorClassName.get(i), connectionParams.get(i));
+         }
+
+         transportConfigurations[i] = tc;
+      }
+      return transportConfigurations;
+   }
+
    public ActiveMQConnectionFactory newConnectionFactory(ConnectionFactoryProperties overrideProperties) {
       ActiveMQConnectionFactory cf;
       List<String> connectorClassName = overrideProperties.getParsedConnectorClassNames() != null ? overrideProperties.getParsedConnectorClassNames() : raProperties.getParsedConnectorClassNames();
@@ -1766,26 +1795,7 @@ public class ActiveMQResourceAdapter implements ResourceAdapter, Serializable {
             cf = ActiveMQJMSClient.createConnectionFactoryWithoutHA(groupConfiguration, JMSFactoryType.XA_CF);
          }
       } else if (connectorClassName != null) {
-         TransportConfiguration[] transportConfigurations = new TransportConfiguration[connectorClassName.size()];
-
-         List<Map<String, Object>> connectionParams;
-         if (overrideProperties.getParsedConnectorClassNames() != null) {
-            connectionParams = overrideProperties.getParsedConnectionParameters();
-         } else {
-            connectionParams = raProperties.getParsedConnectionParameters();
-         }
-
-         for (int i = 0; i < connectorClassName.size(); i++) {
-            TransportConfiguration tc;
-            if (connectionParams == null || i >= connectionParams.size()) {
-               tc = new TransportConfiguration(connectorClassName.get(i));
-               ActiveMQRALogger.LOGGER.debug("No connector params provided using default");
-            } else {
-               tc = new TransportConfiguration(connectorClassName.get(i), connectionParams.get(i));
-            }
-
-            transportConfigurations[i] = tc;
-         }
+         TransportConfiguration[] transportConfigurations = createTransportConfiguration(overrideProperties);
 
          if (ActiveMQRALogger.LOGGER.isDebugEnabled()) {
             ActiveMQRALogger.LOGGER.debug("Creating Connection Factory on the resource adapter for transport=" + Arrays.toString(transportConfigurations) + " with ha=" + ha);
@@ -1837,26 +1847,7 @@ public class ActiveMQResourceAdapter implements ResourceAdapter, Serializable {
 
          cf = ActiveMQJMSClient.createConnectionFactoryWithoutHA(groupConfiguration, JMSFactoryType.XA_CF);
       } else {
-         TransportConfiguration[] transportConfigurations = new TransportConfiguration[connectorClassName.size()];
-
-         List<Map<String, Object>> connectionParams;
-         if (overrideProperties.getParsedConnectorClassNames() != null) {
-            connectionParams = overrideProperties.getParsedConnectionParameters();
-         } else {
-            connectionParams = raProperties.getParsedConnectionParameters();
-         }
-
-         for (int i = 0; i < connectorClassName.size(); i++) {
-            TransportConfiguration tc;
-            if (connectionParams == null || i >= connectionParams.size()) {
-               tc = new TransportConfiguration(connectorClassName.get(i));
-               ActiveMQRALogger.LOGGER.debug("No connector params provided using default");
-            } else {
-               tc = new TransportConfiguration(connectorClassName.get(i), connectionParams.get(i));
-            }
-
-            transportConfigurations[i] = tc;
-         }
+         TransportConfiguration[] transportConfigurations = createTransportConfiguration(overrideProperties);
 
          if (ActiveMQRALogger.LOGGER.isDebugEnabled()) {
             ActiveMQRALogger.LOGGER.debug("Creating Recovery Connection Factory on the resource adapter for transport=" + Arrays.toString(transportConfigurations));

@@ -20,6 +20,7 @@ package org.apache.activemq.artemis.core.remoting.impl;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import javax.net.ssl.SSLContext;
 
 import org.apache.activemq.artemis.api.core.BaseInterceptor;
 import org.apache.activemq.artemis.spi.core.protocol.ProtocolManager;
@@ -28,6 +29,7 @@ import org.apache.activemq.artemis.spi.core.remoting.Acceptor;
 public abstract class AbstractAcceptor implements Acceptor {
 
    protected final Map<String, ProtocolManager> protocolMap;
+   private SSLContext sslContext;
 
    public AbstractAcceptor(Map<String, ProtocolManager> protocolMap) {
       this.protocolMap = protocolMap;
@@ -46,6 +48,16 @@ public abstract class AbstractAcceptor implements Acceptor {
 
    public Map<String, ProtocolManager> getProtocolMap() {
       return Collections.unmodifiableMap(protocolMap);
+   }
+
+   @Override
+   public SSLContext getSslContext() {
+      return sslContext;
+   }
+
+   @Override
+   public void setSslContext(SSLContext sslContext) {
+      this.sslContext = sslContext;
    }
 
 }

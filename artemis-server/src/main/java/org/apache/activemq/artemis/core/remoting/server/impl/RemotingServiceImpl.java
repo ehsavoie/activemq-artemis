@@ -269,6 +269,7 @@ public class RemotingServiceImpl implements RemotingService, ServerConnectionLif
          }
 
          acceptor = factory.createAcceptor(info.getName(), clusterConnection, info.getParams(), new DelegatingBufferHandler(), this, threadPool, scheduledThreadPool, selectedProtocols);
+         acceptor.setSslContext(info.getSslContext());
 
          if (defaultInvmSecurityPrincipal != null && acceptor.isUnsecurable()) {
             acceptor.setDefaultActiveMQPrincipal(defaultInvmSecurityPrincipal);

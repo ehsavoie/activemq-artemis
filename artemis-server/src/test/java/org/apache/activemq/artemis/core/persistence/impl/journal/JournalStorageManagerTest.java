@@ -59,11 +59,15 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
+import java.io.File;
+
 @RunWith(Parameterized.class)
 public class JournalStorageManagerTest extends ActiveMQTestBase {
 
    @Parameterized.Parameter
    public JournalType journalType;
+
+   private static File largeMessageFile;
 
    @Parameterized.Parameters(name = "journal type={0}")
    public static Collection<Object[]> getParams() {
@@ -89,6 +93,9 @@ public class JournalStorageManagerTest extends ActiveMQTestBase {
       ioExecutor.shutdownNow();
       executor.shutdownNow();
       testExecutor.shutdownNow();
+      if (largeMessageFile != null) {
+         largeMessageFile.delete();
+      }
    }
 
    /**
@@ -128,6 +135,7 @@ public class JournalStorageManagerTest extends ActiveMQTestBase {
       manager.startReplication(replicationManager, pagingManager, UUID.randomUUID().toString(), false, 0);
       final LargeServerMessage largeMessage = manager.createLargeMessage(manager.generateID() + 1, new CoreMessage());
       largeMessage.setDurable(true);
+      largeMessageFile = largeMessage.getFile().getJavaFile();
       when(replicationManager.isSynchronizing()).thenReturn(true);
       largeMessage.deleteFile();
       final long pendingRecordID = largeMessage.getPendingRecordID();

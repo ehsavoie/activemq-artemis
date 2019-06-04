@@ -283,7 +283,17 @@ public class NettyConnector extends AbstractConnector {
                          final Executor closeExecutor,
                          final Executor threadPool,
                          final ScheduledExecutorService scheduledThreadPool) {
-      this(configuration, handler, listener, closeExecutor, threadPool, scheduledThreadPool, new ActiveMQClientProtocolManager());
+      this(configuration, handler, listener, closeExecutor, threadPool, scheduledThreadPool, new ActiveMQClientProtocolManager(), null);
+   }
+
+   public NettyConnector(final Map<String, Object> configuration,
+                         final BufferHandler handler,
+                         final BaseConnectionLifeCycleListener<?> listener,
+                         final Executor closeExecutor,
+                         final Executor threadPool,
+                         final ScheduledExecutorService scheduledThreadPool,
+                         final SSLContext ssLContext) {
+      this(configuration, handler, listener, closeExecutor, threadPool, scheduledThreadPool, new ActiveMQClientProtocolManager(), ssLContext);
    }
 
    public NettyConnector(final Map<String, Object> configuration,
@@ -293,6 +303,17 @@ public class NettyConnector extends AbstractConnector {
                          final Executor threadPool,
                          final ScheduledExecutorService scheduledThreadPool,
                          final ClientProtocolManager protocolManager) {
+      this(configuration, handler, listener, closeExecutor, threadPool, scheduledThreadPool, protocolManager, null);
+   }
+
+   public NettyConnector(final Map<String, Object> configuration,
+                         final BufferHandler handler,
+                         final BaseConnectionLifeCycleListener<?> listener,
+                         final Executor closeExecutor,
+                         final Executor threadPool,
+                         final ScheduledExecutorService scheduledThreadPool,
+                         final ClientProtocolManager protocolManager,
+                         final SSLContext sslContext) {
       super(configuration);
 
       this.protocolManager = protocolManager;
@@ -386,7 +407,7 @@ public class NettyConnector extends AbstractConnector {
          sniHost = TransportConstants.DEFAULT_SNIHOST_CONFIG;
          useDefaultSslContext = TransportConstants.DEFAULT_USE_DEFAULT_SSL_CONTEXT;
       }
-
+      this.setSslContext(sslContext);
       tcpNoDelay = ConfigurationHelper.getBooleanProperty(TransportConstants.TCP_NODELAY_PROPNAME, TransportConstants.DEFAULT_TCP_NODELAY, configuration);
       tcpSendBufferSize = ConfigurationHelper.getIntProperty(TransportConstants.TCP_SENDBUFFER_SIZE_PROPNAME, TransportConstants.DEFAULT_TCP_SENDBUFFER_SIZE, configuration);
       tcpReceiveBufferSize = ConfigurationHelper.getIntProperty(TransportConstants.TCP_RECEIVEBUFFER_SIZE_PROPNAME, TransportConstants.DEFAULT_TCP_RECEIVEBUFFER_SIZE, configuration);
@@ -621,21 +642,7 @@ public class NettyConnector extends AbstractConnector {
                                       String truststoreProvider,
                                       String truststorePath,
                                       String truststorePassword) throws Exception {
-      SSLContext context;
-      if (useDefaultSslContext) {
-         context = SSLContext.getDefault();
-      } else {
-         context = new SSLSupport()
-            .setKeystoreProvider(keystoreProvider)
-            .setKeystorePath(keystorePath)
-            .setKeystorePassword(keystorePassword)
-            .setTruststoreProvider(truststoreProvider)
-            .setTruststorePath(truststorePath)
-            .setTruststorePassword(truststorePassword)
-            .setTrustAll(trustAll)
-            .setCrlPath(crlPath)
-            .createContext();
-      }
+      final SSLContext context = createSslContext(keystoreProvider, keystorePath, keystorePassword, truststoreProvider, truststorePath, truststorePassword);
       Subject subject = null;
       if (kerb5Config != null) {
          LoginContext loginContext = new LoginContext(kerb5Config);
@@ -655,6 +662,26 @@ public class NettyConnector extends AbstractConnector {
          }
       });
       return engine;
+   }
+
+   private SSLContext createSslContext(String keystoreProvider, String keystorePath, String keystorePassword, String truststoreProvider, String truststorePath, String truststorePassword) throws Exception {
+      if (getSslContext() == null) {
+         if (useDefaultSslContext) {
+            this.setSslContext(SSLContext.getDefault());
+         } else {
+            this.setSslContext(new SSLSupport()
+                  .setKeystoreProvider(keystoreProvider)
+                  .setKeystorePath(keystorePath)
+                  .setKeystorePassword(keystorePassword)
+                  .setTruststoreProvider(truststoreProvider)
+                  .setTruststorePath(truststorePath)
+                  .setTruststorePassword(truststorePassword)
+                  .setTrustAll(trustAll)
+                  .setCrlPath(crlPath)
+                  .createContext());
+         }
+      }
+      return getSslContext();
    }
 
    private SSLEngine loadOpenSslEngine(ByteBufAllocator alloc,

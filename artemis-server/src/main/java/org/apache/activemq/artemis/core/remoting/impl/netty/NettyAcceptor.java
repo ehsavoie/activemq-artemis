@@ -223,9 +223,6 @@ public class NettyAcceptor extends AbstractAcceptor {
 
    private final long connectionsAllowed;
 
-   private Map<String, Object> extraConfigs;
-
-
    final AtomicBoolean warningPrinted = new AtomicBoolean(false);
 
    final Executor failureExecutor;
@@ -568,31 +565,13 @@ public class NettyAcceptor extends AbstractAcceptor {
    }
 
    private SSLEngine loadJdkSslEngine() throws Exception {
-      final SSLContext context;
-      try {
-         if (kerb5Config == null && keyStorePath == null && TransportConstants.DEFAULT_TRUSTSTORE_PROVIDER.equals(keyStoreProvider))
-            throw new IllegalArgumentException("If \"" + TransportConstants.SSL_ENABLED_PROP_NAME + "\" is true then \"" + TransportConstants.KEYSTORE_PATH_PROP_NAME + "\" must be non-null " + "unless an alternative \"" + TransportConstants.KEYSTORE_PROVIDER_PROP_NAME + "\" has been specified.");
-         context = new SSLSupport()
-            .setKeystoreProvider(keyStoreProvider)
-            .setKeystorePath(keyStorePath)
-            .setKeystorePassword(keyStorePassword)
-            .setTruststoreProvider(trustStoreProvider)
-            .setTruststorePath(trustStorePath)
-            .setTruststorePassword(trustStorePassword)
-            .setCrlPath(crlPath)
-            .createContext();
-      } catch (Exception e) {
-         IllegalStateException ise = new IllegalStateException("Unable to create NettyAcceptor for " + host + ":" + port);
-         ise.initCause(e);
-         throw ise;
-      }
       Subject subject = null;
       if (kerb5Config != null) {
          LoginContext loginContext = new LoginContext(kerb5Config);
          loginContext.login();
          subject = loginContext.getSubject();
       }
-
+      final SSLContext context = createSslContext();
       SSLEngine engine = Subject.doAs(subject, new PrivilegedExceptionAction<SSLEngine>() {
          @Override
          public SSLEngine run() {
@@ -604,6 +583,29 @@ public class NettyAcceptor extends AbstractAcceptor {
          }
       });
       return engine;
+   }
+
+   private SSLContext createSslContext() throws Exception {
+      if (getSslContext() == null) {
+         try {
+            if (kerb5Config == null && keyStorePath == null && TransportConstants.DEFAULT_TRUSTSTORE_PROVIDER.equals(keyStoreProvider))
+                  throw new IllegalArgumentException("If \"" + TransportConstants.SSL_ENABLED_PROP_NAME + "\" is true then \"" + TransportConstants.KEYSTORE_PATH_PROP_NAME + "\" must be non-null " + "unless an alternative \"" + TransportConstants.KEYSTORE_PROVIDER_PROP_NAME + "\" has been specified.");
+            setSslContext(new SSLSupport()
+               .setKeystoreProvider(keyStoreProvider)
+               .setKeystorePath(keyStorePath)
+               .setKeystorePassword(keyStorePassword)
+               .setTruststoreProvider(trustStoreProvider)
+               .setTruststorePath(trustStorePath)
+               .setTruststorePassword(trustStorePassword)
+               .setCrlPath(crlPath)
+               .createContext());
+         } catch (Exception e) {
+            IllegalStateException ise = new IllegalStateException("Unable to create NettyAcceptor for " + host + ":" + port);
+            ise.initCause(e);
+            throw ise;
+         }
+      }
+      return getSslContext();
    }
 
    private SSLEngine loadOpenSslEngine(ByteBufAllocator alloc) throws Exception {

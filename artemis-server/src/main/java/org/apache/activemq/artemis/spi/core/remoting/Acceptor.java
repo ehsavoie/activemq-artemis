@@ -18,6 +18,7 @@ package org.apache.activemq.artemis.spi.core.remoting;
 
 import java.util.List;
 import java.util.Map;
+import javax.net.ssl.SSLContext;
 
 import org.apache.activemq.artemis.api.core.BaseInterceptor;
 import org.apache.activemq.artemis.core.security.ActiveMQPrincipal;
@@ -78,4 +79,11 @@ public interface Acceptor extends ActiveMQComponent {
     * stores on acceptors which support SSL.
     */
    void reload();
+
+   default SSLContext getSslContext() {
+      return null;
+   }
+
+   default void setSslContext(SSLContext sslContext) {
+   }
 }

@@ -122,6 +122,8 @@ public class TransportConstants {
 
    public static final String SSL_PROVIDER = "sslProvider";
 
+   public static final String SSL_CONTEXT = "sslContext";
+
    public static final String NETTY_VERSION;
 
    /**
@@ -366,6 +368,7 @@ public class TransportConstants {
       allowableAcceptorKeys.add(TransportConstants.SSL_PROVIDER);
       allowableAcceptorKeys.add(TransportConstants.SHUTDOWN_TIMEOUT);
       allowableAcceptorKeys.add(TransportConstants.QUIET_PERIOD);
+      allowableAcceptorKeys.add(TransportConstants.SSL_CONTEXT);
 
       ALLOWABLE_ACCEPTOR_KEYS = Collections.unmodifiableSet(allowableAcceptorKeys);
 
@@ -415,6 +418,7 @@ public class TransportConstants {
       allowableConnectorKeys.add(TransportConstants.SSL_PROVIDER);
       allowableConnectorKeys.add(TransportConstants.HANDSHAKE_TIMEOUT);
       allowableConnectorKeys.add(TransportConstants.CRL_PATH_PROP_NAME);
+      allowableConnectorKeys.add(TransportConstants.SSL_CONTEXT);
 
       ALLOWABLE_CONNECTOR_KEYS = Collections.unmodifiableSet(allowableConnectorKeys);
 

@@ -17,6 +17,7 @@
 package org.apache.activemq.artemis.spi.core.remoting;
 
 import java.util.Map;
+import javax.net.ssl.SSLContext;
 
 /**
  * A Connector is used by the client for creating and controlling a connection.
@@ -59,4 +60,11 @@ public interface Connector {
     * @return true means the configuration is equivalent to the connector. false otherwise.
     */
    boolean isEquivalent(Map<String, Object> configuration);
+
+   default SSLContext getSslContext() {
+      return null;
+   }
+
+   default void setSslContext(SSLContext sslContext) {
+   }
 }
