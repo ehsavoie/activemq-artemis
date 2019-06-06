@@ -115,6 +115,8 @@ public class TransportConstants {
 
    public static final String BACKLOG_PROP_NAME = "backlog";
 
+   public static final String SSL_CONTEXT = "sslContext";
+
    public static final String USE_DEFAULT_SSL_CONTEXT_PROP_NAME = "useDefaultSslContext";
 
    public static final String SSL_PROVIDER = "sslProvider";

@@ -272,6 +272,8 @@ public class NettyConnector extends AbstractConnector {
 
    private final ClientProtocolManager protocolManager;
 
+   private SSLContext ssLContext;
+
    // Static --------------------------------------------------------
 
    // Constructors --------------------------------------------------
@@ -339,52 +341,57 @@ public class NettyConnector extends AbstractConnector {
       localAddress = ConfigurationHelper.getStringProperty(TransportConstants.LOCAL_ADDRESS_PROP_NAME, TransportConstants.DEFAULT_LOCAL_ADDRESS, configuration);
 
       localPort = ConfigurationHelper.getIntProperty(TransportConstants.LOCAL_PORT_PROP_NAME, TransportConstants.DEFAULT_LOCAL_PORT, configuration);
-      if (sslEnabled) {
-         keyStoreProvider = ConfigurationHelper.getStringProperty(TransportConstants.KEYSTORE_PROVIDER_PROP_NAME, TransportConstants.DEFAULT_KEYSTORE_PROVIDER, configuration);
-
-         keyStorePath = ConfigurationHelper.getStringProperty(TransportConstants.KEYSTORE_PATH_PROP_NAME, TransportConstants.DEFAULT_KEYSTORE_PATH, configuration);
-
-         keyStorePassword = ConfigurationHelper.getPasswordProperty(TransportConstants.KEYSTORE_PASSWORD_PROP_NAME, TransportConstants.DEFAULT_KEYSTORE_PASSWORD, configuration, ActiveMQDefaultConfiguration.getPropMaskPassword(), ActiveMQDefaultConfiguration.getPropPasswordCodec());
-
-         trustStoreProvider = ConfigurationHelper.getStringProperty(TransportConstants.TRUSTSTORE_PROVIDER_PROP_NAME, TransportConstants.DEFAULT_TRUSTSTORE_PROVIDER, configuration);
-
-         trustStorePath = ConfigurationHelper.getStringProperty(TransportConstants.TRUSTSTORE_PATH_PROP_NAME, TransportConstants.DEFAULT_TRUSTSTORE_PATH, configuration);
-
-         trustStorePassword = ConfigurationHelper.getPasswordProperty(TransportConstants.TRUSTSTORE_PASSWORD_PROP_NAME, TransportConstants.DEFAULT_TRUSTSTORE_PASSWORD, configuration, ActiveMQDefaultConfiguration.getPropMaskPassword(), ActiveMQDefaultConfiguration.getPropPasswordCodec());
-
-         crlPath = ConfigurationHelper.getStringProperty(TransportConstants.CRL_PATH_PROP_NAME, TransportConstants.DEFAULT_CRL_PATH, configuration);
-
-         enabledCipherSuites = ConfigurationHelper.getStringProperty(TransportConstants.ENABLED_CIPHER_SUITES_PROP_NAME, TransportConstants.DEFAULT_ENABLED_CIPHER_SUITES, configuration);
-
-         enabledProtocols = ConfigurationHelper.getStringProperty(TransportConstants.ENABLED_PROTOCOLS_PROP_NAME, TransportConstants.DEFAULT_ENABLED_PROTOCOLS, configuration);
-
-         verifyHost = ConfigurationHelper.getBooleanProperty(TransportConstants.VERIFY_HOST_PROP_NAME, TransportConstants.DEFAULT_VERIFY_HOST, configuration);
-
-         trustAll = ConfigurationHelper.getBooleanProperty(TransportConstants.TRUST_ALL_PROP_NAME, TransportConstants.DEFAULT_TRUST_ALL, configuration);
-
-         forceSSLParameters = ConfigurationHelper.getBooleanProperty(TransportConstants.FORCE_SSL_PARAMETERS, TransportConstants.DEFAULT_FORCE_SSL_PARAMETERS, configuration);
-
-         sslProvider = ConfigurationHelper.getStringProperty(TransportConstants.SSL_PROVIDER, TransportConstants.DEFAULT_SSL_PROVIDER, configuration);
-
-         sniHost = ConfigurationHelper.getStringProperty(TransportConstants.SNIHOST_PROP_NAME, TransportConstants.DEFAULT_SNIHOST_CONFIG, configuration);
-
-         kerb5Config = ConfigurationHelper.getStringProperty(TransportConstants.SSL_KRB5_CONFIG_PROP_NAME, TransportConstants.DEFAULT_SSL_KRB5_CONFIG, configuration);
-
-         useDefaultSslContext = ConfigurationHelper.getBooleanProperty(TransportConstants.USE_DEFAULT_SSL_CONTEXT_PROP_NAME, TransportConstants.DEFAULT_USE_DEFAULT_SSL_CONTEXT, configuration);
+      if (configuration.containsKey(TransportConstants.SSL_CONTEXT)) {
+         this.ssLContext = (SSLContext) configuration.get(TransportConstants.SSL_CONTEXT);
+         this.sslEnabled = true;
       } else {
-         keyStoreProvider = TransportConstants.DEFAULT_KEYSTORE_PROVIDER;
-         keyStorePath = TransportConstants.DEFAULT_KEYSTORE_PATH;
-         keyStorePassword = TransportConstants.DEFAULT_KEYSTORE_PASSWORD;
-         trustStoreProvider = TransportConstants.DEFAULT_TRUSTSTORE_PROVIDER;
-         trustStorePath = TransportConstants.DEFAULT_TRUSTSTORE_PATH;
-         trustStorePassword = TransportConstants.DEFAULT_TRUSTSTORE_PASSWORD;
-         crlPath = TransportConstants.DEFAULT_CRL_PATH;
-         enabledCipherSuites = TransportConstants.DEFAULT_ENABLED_CIPHER_SUITES;
-         enabledProtocols = TransportConstants.DEFAULT_ENABLED_PROTOCOLS;
-         verifyHost = TransportConstants.DEFAULT_VERIFY_HOST;
-         trustAll = TransportConstants.DEFAULT_TRUST_ALL;
-         sniHost = TransportConstants.DEFAULT_SNIHOST_CONFIG;
-         useDefaultSslContext = TransportConstants.DEFAULT_USE_DEFAULT_SSL_CONTEXT;
+         if (sslEnabled) {
+            keyStoreProvider = ConfigurationHelper.getStringProperty(TransportConstants.KEYSTORE_PROVIDER_PROP_NAME, TransportConstants.DEFAULT_KEYSTORE_PROVIDER, configuration);
+
+            keyStorePath = ConfigurationHelper.getStringProperty(TransportConstants.KEYSTORE_PATH_PROP_NAME, TransportConstants.DEFAULT_KEYSTORE_PATH, configuration);
+
+            keyStorePassword = ConfigurationHelper.getPasswordProperty(TransportConstants.KEYSTORE_PASSWORD_PROP_NAME, TransportConstants.DEFAULT_KEYSTORE_PASSWORD, configuration, ActiveMQDefaultConfiguration.getPropMaskPassword(), ActiveMQDefaultConfiguration.getPropPasswordCodec());
+
+            trustStoreProvider = ConfigurationHelper.getStringProperty(TransportConstants.TRUSTSTORE_PROVIDER_PROP_NAME, TransportConstants.DEFAULT_TRUSTSTORE_PROVIDER, configuration);
+
+            trustStorePath = ConfigurationHelper.getStringProperty(TransportConstants.TRUSTSTORE_PATH_PROP_NAME, TransportConstants.DEFAULT_TRUSTSTORE_PATH, configuration);
+
+            trustStorePassword = ConfigurationHelper.getPasswordProperty(TransportConstants.TRUSTSTORE_PASSWORD_PROP_NAME, TransportConstants.DEFAULT_TRUSTSTORE_PASSWORD, configuration, ActiveMQDefaultConfiguration.getPropMaskPassword(), ActiveMQDefaultConfiguration.getPropPasswordCodec());
+
+            crlPath = ConfigurationHelper.getStringProperty(TransportConstants.CRL_PATH_PROP_NAME, TransportConstants.DEFAULT_CRL_PATH, configuration);
+
+            enabledCipherSuites = ConfigurationHelper.getStringProperty(TransportConstants.ENABLED_CIPHER_SUITES_PROP_NAME, TransportConstants.DEFAULT_ENABLED_CIPHER_SUITES, configuration);
+
+            enabledProtocols = ConfigurationHelper.getStringProperty(TransportConstants.ENABLED_PROTOCOLS_PROP_NAME, TransportConstants.DEFAULT_ENABLED_PROTOCOLS, configuration);
+
+            verifyHost = ConfigurationHelper.getBooleanProperty(TransportConstants.VERIFY_HOST_PROP_NAME, TransportConstants.DEFAULT_VERIFY_HOST, configuration);
+
+            trustAll = ConfigurationHelper.getBooleanProperty(TransportConstants.TRUST_ALL_PROP_NAME, TransportConstants.DEFAULT_TRUST_ALL, configuration);
+
+            forceSSLParameters = ConfigurationHelper.getBooleanProperty(TransportConstants.FORCE_SSL_PARAMETERS, TransportConstants.DEFAULT_FORCE_SSL_PARAMETERS, configuration);
+
+            sslProvider = ConfigurationHelper.getStringProperty(TransportConstants.SSL_PROVIDER, TransportConstants.DEFAULT_SSL_PROVIDER, configuration);
+
+            sniHost = ConfigurationHelper.getStringProperty(TransportConstants.SNIHOST_PROP_NAME, TransportConstants.DEFAULT_SNIHOST_CONFIG, configuration);
+
+            kerb5Config = ConfigurationHelper.getStringProperty(TransportConstants.SSL_KRB5_CONFIG_PROP_NAME, TransportConstants.DEFAULT_SSL_KRB5_CONFIG, configuration);
+
+            useDefaultSslContext = ConfigurationHelper.getBooleanProperty(TransportConstants.USE_DEFAULT_SSL_CONTEXT_PROP_NAME, TransportConstants.DEFAULT_USE_DEFAULT_SSL_CONTEXT, configuration);
+         } else {
+            keyStoreProvider = TransportConstants.DEFAULT_KEYSTORE_PROVIDER;
+            keyStorePath = TransportConstants.DEFAULT_KEYSTORE_PATH;
+            keyStorePassword = TransportConstants.DEFAULT_KEYSTORE_PASSWORD;
+            trustStoreProvider = TransportConstants.DEFAULT_TRUSTSTORE_PROVIDER;
+            trustStorePath = TransportConstants.DEFAULT_TRUSTSTORE_PATH;
+            trustStorePassword = TransportConstants.DEFAULT_TRUSTSTORE_PASSWORD;
+            crlPath = TransportConstants.DEFAULT_CRL_PATH;
+            enabledCipherSuites = TransportConstants.DEFAULT_ENABLED_CIPHER_SUITES;
+            enabledProtocols = TransportConstants.DEFAULT_ENABLED_PROTOCOLS;
+            verifyHost = TransportConstants.DEFAULT_VERIFY_HOST;
+            trustAll = TransportConstants.DEFAULT_TRUST_ALL;
+            sniHost = TransportConstants.DEFAULT_SNIHOST_CONFIG;
+            useDefaultSslContext = TransportConstants.DEFAULT_USE_DEFAULT_SSL_CONTEXT;
+         }
       }
 
       tcpNoDelay = ConfigurationHelper.getBooleanProperty(TransportConstants.TCP_NODELAY_PROPNAME, TransportConstants.DEFAULT_TCP_NODELAY, configuration);
@@ -621,21 +628,7 @@ public class NettyConnector extends AbstractConnector {
                                       String truststoreProvider,
                                       String truststorePath,
                                       String truststorePassword) throws Exception {
-      SSLContext context;
-      if (useDefaultSslContext) {
-         context = SSLContext.getDefault();
-      } else {
-         context = new SSLSupport()
-            .setKeystoreProvider(keystoreProvider)
-            .setKeystorePath(keystorePath)
-            .setKeystorePassword(keystorePassword)
-            .setTruststoreProvider(truststoreProvider)
-            .setTruststorePath(truststorePath)
-            .setTruststorePassword(truststorePassword)
-            .setTrustAll(trustAll)
-            .setCrlPath(crlPath)
-            .createContext();
-      }
+      final SSLContext context = createSslContext(keystoreProvider, keystorePath, keystorePassword, truststoreProvider, truststorePath, truststorePassword);
       Subject subject = null;
       if (kerb5Config != null) {
          LoginContext loginContext = new LoginContext(kerb5Config);
@@ -655,6 +648,26 @@ public class NettyConnector extends AbstractConnector {
          }
       });
       return engine;
+   }
+
+   private SSLContext createSslContext(String keystoreProvider, String keystorePath, String keystorePassword, String truststoreProvider, String truststorePath, String truststorePassword) throws Exception {
+      if (this.ssLContext == null) {
+         if (useDefaultSslContext) {
+            this.ssLContext = SSLContext.getDefault();
+         } else {
+            this.ssLContext = new SSLSupport()
+                  .setKeystoreProvider(keystoreProvider)
+                  .setKeystorePath(keystorePath)
+                  .setKeystorePassword(keystorePassword)
+                  .setTruststoreProvider(truststoreProvider)
+                  .setTruststorePath(truststorePath)
+                  .setTruststorePassword(truststorePassword)
+                  .setTrustAll(trustAll)
+                  .setCrlPath(crlPath)
+                  .createContext();
+         }
+      }
+      return this.ssLContext;
    }
 
    private SSLEngine loadOpenSslEngine(ByteBufAllocator alloc,

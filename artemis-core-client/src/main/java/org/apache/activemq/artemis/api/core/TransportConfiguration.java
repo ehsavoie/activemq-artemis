@@ -20,9 +20,11 @@ import javax.json.JsonObject;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+import javax.net.ssl.SSLContext;
 
 import org.apache.activemq.artemis.core.client.ActiveMQClientMessageBundle;
 import org.apache.activemq.artemis.core.remoting.impl.TransportConfigurationUtil;
+import org.apache.activemq.artemis.core.remoting.impl.netty.TransportConstants;
 import org.apache.activemq.artemis.utils.JsonLoader;
 import org.apache.activemq.artemis.utils.UUIDGenerator;
 
@@ -54,6 +56,8 @@ public class TransportConfiguration implements Serializable {
 
    private Map<String, Object> extraProps;
 
+   private transient SSLContext sslContext;
+
    private static final byte TYPE_BOOLEAN = 0;
 
    private static final byte TYPE_INT = 1;
@@ -63,7 +67,9 @@ public class TransportConfiguration implements Serializable {
    private static final byte TYPE_STRING = 3;
 
    public JsonObject toJson() {
-      return JsonLoader.createObjectBuilder().add("name", name).add("factoryClassName", factoryClassName).add("params", JsonUtil.toJsonObject(params)).add("extraProps", JsonUtil.toJsonObject(extraProps)).build();
+      Map<String, Object> parameters = new HashMap<>(this.params);
+      parameters.remove(TransportConstants.SSL_CONTEXT);
+      return JsonLoader.createObjectBuilder().add("name", name).add("factoryClassName", factoryClassName).add("params", JsonUtil.toJsonObject(parameters)).add("extraProps", JsonUtil.toJsonObject(extraProps)).build();
    }
 
    /**
