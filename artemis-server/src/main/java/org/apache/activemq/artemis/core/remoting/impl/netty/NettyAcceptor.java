@@ -91,6 +91,7 @@ import org.apache.activemq.artemis.spi.core.protocol.ProtocolManager;
 import org.apache.activemq.artemis.spi.core.remoting.BufferHandler;
 import org.apache.activemq.artemis.spi.core.remoting.Connection;
 import org.apache.activemq.artemis.spi.core.remoting.ServerConnectionLifeCycleListener;
+import org.apache.activemq.artemis.spi.core.remoting.ssl.SSLContextFactoryProvider;
 import org.apache.activemq.artemis.utils.ActiveMQThreadFactory;
 import org.apache.activemq.artemis.utils.ConfigurationHelper;
 import org.apache.activemq.artemis.utils.collections.TypedProperties;
@@ -500,7 +501,7 @@ public class NettyAcceptor extends AbstractAcceptor {
 
    public synchronized SslHandler getSslHandler(ByteBufAllocator alloc) throws Exception {
       SSLEngine engine;
-      if (sslProvider.equals(TransportConstants.OPENSSL_PROVIDER)) {
+      if (TransportConstants.OPENSSL_PROVIDER.equals(sslProvider)) {
          engine = loadOpenSslEngine(alloc);
       } else {
          engine = loadJdkSslEngine();
@@ -575,18 +576,10 @@ public class NettyAcceptor extends AbstractAcceptor {
    private SSLEngine loadJdkSslEngine() throws Exception {
       final SSLContext context;
       try {
-         if (kerb5Config == null && keyStorePath == null && TransportConstants.DEFAULT_TRUSTSTORE_PROVIDER.equals(keyStoreProvider))
+         if (kerb5Config == null && keyStorePath == null && !configuration.containsKey(TransportConstants.SSL_CONTEXT_PROP_NAME)) {
             throw new IllegalArgumentException("If \"" + TransportConstants.SSL_ENABLED_PROP_NAME + "\" is true then \"" + TransportConstants.KEYSTORE_PATH_PROP_NAME + "\" must be non-null " + "unless an alternative \"" + TransportConstants.KEYSTORE_PROVIDER_PROP_NAME + "\" has been specified.");
-         context = new SSLSupport()
-            .setKeystoreProvider(keyStoreProvider)
-            .setKeystorePath(keyStorePath)
-            .setKeystorePassword(keyStorePassword)
-            .setTruststoreProvider(trustStoreProvider)
-            .setTruststorePath(trustStorePath)
-            .setTruststorePassword(trustStorePassword)
-            .setCrlPath(crlPath)
-            .setTrustManagerFactoryPlugin(trustManagerFactoryPlugin)
-            .createContext();
+         }
+         context = SSLContextFactoryProvider.getSSLContextFactory().getSSLContext(configuration);
       } catch (Exception e) {
          IllegalStateException ise = new IllegalStateException("Unable to create NettyAcceptor for " + host + ":" + port);
          ise.initCause(e);

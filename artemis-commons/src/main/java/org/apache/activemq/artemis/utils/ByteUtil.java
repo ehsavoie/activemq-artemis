@@ -26,6 +26,7 @@ import java.util.regex.Pattern;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.util.internal.PlatformDependent;
+import java.util.Locale;
 import org.apache.activemq.artemis.api.core.ActiveMQBuffer;
 import org.apache.activemq.artemis.api.core.SimpleString;
 import org.apache.activemq.artemis.logs.ActiveMQUtilBundle;
@@ -460,6 +461,6 @@ public class ByteUtil {
          i++;
       }
 
-      return String.format("%.1f%sB", bytes / BYTE_MAGNITUDES[i], BYTE_SUFFIXES[i]);
+      return String.format(Locale.ROOT, "%.1f%sB", bytes / BYTE_MAGNITUDES[i], BYTE_SUFFIXES[i]);
    }
 }
