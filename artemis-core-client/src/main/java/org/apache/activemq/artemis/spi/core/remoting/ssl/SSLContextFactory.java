@@ -17,9 +17,6 @@ package org.apache.activemq.artemis.spi.core.remoting.ssl;
 
 import java.util.Map;
 import javax.net.ssl.SSLContext;
-import org.apache.activemq.artemis.core.remoting.impl.netty.TransportConstants;
-import org.apache.activemq.artemis.core.remoting.impl.ssl.SSLSupport;
-import org.apache.activemq.artemis.utils.ConfigurationHelper;
 import org.jboss.logging.Logger;
 
 /**
@@ -49,30 +46,6 @@ public interface SSLContextFactory extends Comparable<SSLContextFactory> {
            String crlPath, String trustManagerFactoryPlugin, boolean trustAll) throws Exception;
 
    default void clearSSLContexts() {
-   }
-
-   default SSLContext createSSLContext(Map<String, Object> configuration,
-           String keystoreProvider, String keystorePath, String keystorePassword,
-           String truststoreProvider, String truststorePath, String truststorePassword,
-           String crlPath, String trustManagerFactoryPlugin, boolean trustAll) throws Exception {
-      final StringBuilder builder = new StringBuilder();
-      configuration.forEach((k,v) -> builder.append("\r\n").append(k).append("=").append(v));
-      LOGGER.debugf("Creating SSL context with configuration %s", builder.toString());
-      boolean useDefaultSslContext = ConfigurationHelper.getBooleanProperty(TransportConstants.USE_DEFAULT_SSL_CONTEXT_PROP_NAME, TransportConstants.DEFAULT_USE_DEFAULT_SSL_CONTEXT, configuration);
-      if (useDefaultSslContext) {
-         return SSLContext.getDefault();
-      }
-      return new SSLSupport()
-              .setKeystoreProvider(keystoreProvider)
-              .setKeystorePath(keystorePath)
-              .setKeystorePassword(keystorePassword)
-              .setTruststoreProvider(truststoreProvider)
-              .setTruststorePath(truststorePath)
-              .setTruststorePassword(truststorePassword)
-              .setTrustAll(trustAll)
-              .setCrlPath(crlPath)
-              .setTrustManagerFactoryPlugin(trustManagerFactoryPlugin)
-              .createContext();
    }
 
    int getPriority();

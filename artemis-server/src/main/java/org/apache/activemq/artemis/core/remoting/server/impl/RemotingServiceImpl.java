@@ -383,7 +383,6 @@ public class RemotingServiceImpl implements RemotingService, ServerConnectionLif
       }
       SSLContextFactoryProvider.getSSLContextFactory().clearSSLContexts();
 
-
       failureCheckAndFlushThread.close(criticalError);
 
       // We need to stop them accepting first so no new connections are accepted after we send the disconnect message
