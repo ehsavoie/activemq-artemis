@@ -42,7 +42,6 @@ import org.apache.activemq.artemis.core.settings.HierarchicalRepository;
 import org.apache.activemq.artemis.core.settings.impl.AddressSettings;
 import org.apache.activemq.artemis.jdbc.store.file.JDBCSequentialFile;
 import org.apache.activemq.artemis.jdbc.store.file.JDBCSequentialFileFactory;
-import org.apache.activemq.artemis.jdbc.store.file.JDBCSequentialFileFactoryDriver;
 import org.apache.activemq.artemis.jdbc.store.sql.PropertySQLProvider;
 import org.apache.activemq.artemis.jdbc.store.sql.SQLProvider;
 import org.apache.activemq.artemis.utils.ExecutorFactory;
@@ -71,15 +70,11 @@ public class PagingStoreFactoryDatabase implements PagingStoreFactory {
 
    protected final StorageManager storageManager;
 
-   private JDBCSequentialFileFactoryDriver dbDriver;
-
    private DatabaseStorageConfiguration dbConf;
 
    private ExecutorFactory executorFactory;
 
    private JDBCSequentialFileFactory pagingFactoryFileFactory;
-
-   private JDBCSequentialFile directoryList;
 
    private final boolean readWholePage;
 
