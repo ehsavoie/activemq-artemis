@@ -17,6 +17,7 @@
 
 package org.apache.activemq.artemis.jdbc.store.sql;
 
+import javax.sql.DataSource;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
@@ -361,6 +362,10 @@ public class PropertySQLProvider implements SQLProvider {
          } catch (IOException e) {
             throw new RuntimeException("Unable to load properties from " + SQL_PROPERTIES_FILE);
          }
+      }
+
+      public Factory(DataSource dataSource) {
+         this(new JDBCConnectionProvider(dataSource));
       }
 
       public Factory(Map<String, Object> dataSourceProperties) {
