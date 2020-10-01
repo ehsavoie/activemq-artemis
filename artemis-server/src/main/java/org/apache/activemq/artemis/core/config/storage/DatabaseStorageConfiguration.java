@@ -160,6 +160,8 @@ public class DatabaseStorageConfiguration implements StoreConfiguration {
             if (jdbcPassword != null) {
                addDataSourceProperty("password", jdbcPassword);
             }
+            // Let the pool to have unbounded number of connections by default to prevent connection starvation
+            addDataSourceProperty("maxTotal", "-1");
          }
          dataSource = JDBCDataSourceUtils.getDataSource(dataSourceClassName, dataSourceProperties);
       }
