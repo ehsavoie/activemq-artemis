@@ -60,8 +60,8 @@ public class PostgresLargeObjectManager {
       if (shouldUseReflection) {
          Object largeObjectManager = getLargeObjectManager(connection);
          try {
-            Method method = largeObjectManager.getClass().getMethod("createLO", Connection.class);
-            return (Long) method.invoke(largeObjectManager, connection);
+            Method method = largeObjectManager.getClass().getMethod("createLO");
+            return (Long) method.invoke(largeObjectManager);
          } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
             throw new SQLException("Couldn't access org.postgresql.largeobject.LargeObjectManager", ex);
          }
@@ -74,8 +74,8 @@ public class PostgresLargeObjectManager {
       if (shouldUseReflection) {
          Object largeObjectManager = getLargeObjectManager(connection);
          try {
-            Method method = largeObjectManager.getClass().getMethod("open", Connection.class, long.class, int.class);
-            return method.invoke(largeObjectManager, connection, oid, mode);
+            Method method = largeObjectManager.getClass().getMethod("open", long.class, int.class);
+            return method.invoke(largeObjectManager, oid, mode);
          } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
             throw new SQLException("Couldn't access org.postgresql.largeobject.LargeObjectManager", ex);
          }
