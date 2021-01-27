@@ -47,11 +47,15 @@
       <module>artemis-jms-client</module>
       <module>artemis-jms-client-all</module>
       <module>artemis-jms-client-osgi</module>
+      <module>artemis-jakarta-client</module>
       <module>artemis-jms-server</module>
+      <module>artemis-jakarta-server</module>
       <module>artemis-journal</module>
       <module>artemis-ra</module>
+      <module>artemis-jakarta-ra</module>
       <module>artemis-rest</module>
       <module>artemis-service-extensions</module>
+      <module>artemis-jakarta-service-extensions</module>
       <module>artemis-jdbc-store</module>
       <module>artemis-maven-plugin</module>
       <module>artemis-server-osgi</module>
