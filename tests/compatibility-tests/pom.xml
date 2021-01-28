@@ -669,6 +669,10 @@
                      <name>ARTEMIS-270</name>
                      <value>${ARTEMIS-270}</value>
                   </property>
+                  <property>
+                     <name>ARTEMIS-JAKARTAEE</name>
+                     <value>${ARTEMIS-JAKARTAEE}</value>
+                  </property>
                </systemProperties>
                <skipTests>${skipCompatibilityTests}</skipTests>
                <argLine>${modular.jdk.surefire.arg} -Djgroups.bind_addr=::1 ${activemq-surefire-argline}</argLine>

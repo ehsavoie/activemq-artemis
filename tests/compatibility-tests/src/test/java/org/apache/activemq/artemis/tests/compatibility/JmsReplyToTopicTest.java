@@ -47,6 +47,10 @@ public class JmsReplyToTopicTest extends VersionedBase {
       combinations.add(new Object[]{SNAPSHOT, SNAPSHOT, ONE_FIVE});
       combinations.add(new Object[]{SNAPSHOT, SNAPSHOT, SNAPSHOT});
       combinations.add(new Object[]{JAKARTAEE, JAKARTAEE, JAKARTAEE});
+      combinations.add(new Object[]{JAKARTAEE, JAKARTAEE, SNAPSHOT});
+      combinations.add(new Object[]{JAKARTAEE, SNAPSHOT, JAKARTAEE});
+      combinations.add(new Object[]{JAKARTAEE, JAKARTAEE, ONE_FIVE});
+      combinations.add(new Object[]{JAKARTAEE, ONE_FIVE, JAKARTAEE});
       return combinations;
    }
 
